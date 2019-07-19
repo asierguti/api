@@ -1,0 +1,590 @@
+openapi: 3.0.1
+info:
+  description: Algorithm service
+  version: 2.0-0
+  title: Algorithm service
+tags:
+  - name: algo
+    description: algo processing
+  - name: processing
+    description: algo processing
+servers:
+  - url: 'http://algo.n-logic.ru:8089/algo-service/v2'
+    description: sandbox
+paths:
+  '/algo/{algoID}/run':
+    post:
+      tags:
+        - processing
+      summary: run algo by algoID
+      description: run algo by algoID
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: algoID
+          description: algo id
+          required: true
+          schema:
+            type: string
+          example: 1
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [html, docx, pdf, links]
+          description: Optional parameter. Name of entities to get
+
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RunAlgo'
+      responses:
+        '200':
+          $ref: '#/components/responses/200AlgoResultLink'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/algo/{algoID}/run-tags':
+    post:
+      tags:
+        - processing
+      summary: run algo by algoID
+      description: run algo by algoID
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: algoID
+          description: algo id
+          required: true
+          schema:
+            type: string
+          example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RunAlgo'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <p></p>
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/algo/clientID/{ClientID}/defaults':
+    post:
+      tags:
+        - processing
+      summary: add default values for entities
+      description: add default values for entities
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: ClientID
+          description: client id
+          required: true
+          schema:
+            type: string
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddDefaults'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <p></p>
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    get:
+      tags:
+        - processing
+      summary: get the default for the given entity
+      description: Get default values for the give entity 
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: ClientID
+          description: client id
+          required: true
+          schema:
+            type: string
+          example: 1
+        - in: query
+          name: entity
+          schema:
+            type: string
+          required: true
+          description: Entity name
+        - in: query
+          name: value
+          schema:
+            type: string
+          required: true
+          description: Entity value
+      responses:
+        '200':
+          $ref: '#/components/responses/200DefaultEntities'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - processing
+      summary: get the default for the given entity
+      description: Get default values for the give entity 
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: ClientID
+          description: client id
+          required: true
+          schema:
+            type: string
+          example: 1
+        - in: query
+          name: entity
+          schema:
+            type: string
+          required: true
+          description: Entity name
+        - in: query
+          name: value
+          schema:
+            type: string
+          required: true
+          description: Entity value
+      responses:
+        '204':
+          $ref: '#/components/responses/204NoContent'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+components:
+  schemas:
+    EntityOptions:
+      type: object
+      properties:
+        defaultValue:
+          type: string
+          format: string
+          default: ''
+        compares:
+          type: array
+          items:
+            type: object
+            properties:
+              rule:
+                type: string
+                enum:
+                  - ''
+                  - совпадает
+                  - не совпадает
+                  - больше
+                  - меньше
+                  - содержит
+                default: ''
+              value:
+                type: string
+                format: string
+                default: ''
+    Entity:
+      type: object
+      properties:
+        name:
+          type: string
+          format: string
+          default: test
+        position:
+          type: integer
+          default: 1
+        options:
+          $ref: '#/components/schemas/EntityOptions'
+    EntitiesList:
+      type: object
+      properties:
+        name:
+          type: string
+          format: string
+          default: test
+    InputEntities:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            default: ''
+          value:
+            type: string
+            default: ''
+    BlockRecord:
+      type: object
+      properties:
+        blockID:
+          type: integer
+          default: 1
+        row:
+          type: integer
+          default: 0
+        colomn:
+          type: integer
+          default: 0
+        list-options:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - numeric
+                - symbolic
+            delimeter:
+              type: string
+              default: .
+            start-from:
+              type: string
+              default: '1'
+    Blocks:
+      type: object
+      properties:
+        algoID:
+          type: integer
+          default: 1
+        blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlockRecord'
+    BlockRecordFullInfo:
+      type: object
+      properties:
+        blockID:
+          type: integer
+          default: 1
+        row:
+          type: integer
+          default: 0
+        colomn:
+          type: integer
+          default: 0
+        text:
+          type: string
+          default: ''
+        entities:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                default: ''
+              char-from:
+                type: integer
+                default: 0
+              char-to:
+                type: integer
+                default: 0
+              default-value:
+                type: string
+                default: ''
+        list-options:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - numeric
+                - symbolic
+            delimeter:
+              type: string
+              default: .
+            start-from:
+              type: string
+              default: '1'
+    BlocksFullInfo:
+      type: object
+      properties:
+        algoID:
+          type: integer
+          default: 1
+        blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlockRecordFullInfo'
+    Check:
+      type: object
+      properties:
+        id:
+          type: integer
+          default: 1
+        position:
+          type: integer
+          default: 1
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entity'
+        addsBlocks:
+          type: array
+          items:
+            type: object
+            properties:
+              blockID:
+                type: integer
+                default: 1
+                description: blockID
+              row:
+                type: integer
+                default: 0
+              colomn:
+                type: integer
+                default: 0
+        removesBlocks:
+          type: array
+          items:
+            type: object
+            properties:
+              blockID:
+                type: integer
+                default: 1
+                description: blockID
+              row:
+                type: integer
+                default: 0
+              colomn:
+                type: integer
+                default: 0
+    Algo:
+      type: object
+      properties:
+        id:
+          type: integer
+          default: 1
+        description:
+          type: string
+          default: ''
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Check'
+    AlgoesList:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            default: 1
+          description:
+            type: string
+            default: ''
+          checks:
+            type: array
+            items:
+              $ref: '#/components/schemas/Check'
+    AlgoID:
+      type: object
+      properties:
+        algoID:
+          type: integer
+          format: int32
+          example: 1
+          
+    RunAlgo:
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            requestID:
+              type: string
+              format: uuid
+              example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+            userID:
+              type: string
+              example: 1
+            clientID:
+              type: string
+              example: 1
+            dialogID:
+              type: string
+              example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+        entities:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                      
+    DefaultEntites:
+      type: object
+      properties:
+        entityName:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+    #'{"entity":["payment_t","value": "prepayme","defaults": [{"email": "ivanov@nlogic.ai"},{"contractor":"test"}]}'
+            
+  #'{"entity":"contractor","value":"ООО «Русс Аутдор»","defaults":[{"document_type":"advertising"},{"contractor_legal_address":"143421, Московская область, Красногорский район, автодорога Балтия, километр 26, БЦ «Рига Ленд», стр. 1"},{"contractor_actual_address":"143421, Московская область, Красногорский район, автодорога Балтия, километр 26, БЦ «Рига Ленд», стр. 1"},{"contractor_tin":"7731196087"},{"contractor_iec":"502401001"},{"contractor_psrn":"1037739331860"},{"contractor_checking_account":"10268810300000008324"},{"contractor_bank_name":"ПАО «Сбербанк»"},{"contractor_corresponding_account":"10235410300000006329"},{"contractor_bic":"987456321"},{"contractor_okpo":"24399828"},{"contractor_ceo":"Дубков Сергей Витальевич"}]}'    
+    AddDefaults:
+      type: object
+      properties:
+        entity:
+          type: string
+        value:
+          type: string
+        defaults:
+          type: array
+          items:
+            type: object
+            properties:
+              entityName:
+                type: string
+          
+            
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          example: 1
+        message:
+          type: string
+  parameters:
+    X-REQUEST-ID:
+      name: X-REQUEST-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    '200':
+      description: Ok
+    '204':
+      description: No Content
+    200AlgoBlocks:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BlocksFullInfo'
+    200EntityData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Entity'
+    200Entityies:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EntitiesList'
+    200AlgoData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Algo'
+    200AlgoesList:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AlgoesList'
+    200AlgoResultLink:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              downloadLink:
+                type: string
+                format: uri
+                example: >-
+                  http://doc-service.n-logic.ru:10001/doc-service/v1/doc/eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    200AlgoID:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AlgoID'
+    200CheckData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Check'
+    200DefaultEntities:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DefaultEntites'
+            
+    204NoContent:
+      description: No content
+
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error

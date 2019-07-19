@@ -1,0 +1,125 @@
+openapi: 3.0.1
+info:
+  description: Конструктор договоров
+  version: 1.0.0
+  title: Docs
+tags:
+  - name: attributes
+    description: Attributes controller
+  - name: tags
+    description: Tags controller
+  - name: blocks
+    description: Blocks controller
+  - name: docs
+    description: Docs controller
+servers:
+  - url: 'http://lex2vec.ru:{port}/docs/v1'
+    description: Sandbox for tests
+    variables:
+      port:
+        enum:
+          - '8082'
+        default: '8082'
+paths:
+  '/attribute':
+    post:
+      tags:
+        - attributes
+      summary: Add a new attribute
+      description: Returns nothing
+      operationId: addAttribute
+      parameters:
+        - $ref: '#/components/parameters/X-Request-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Attributes'
+            example:
+              name: price
+              text: ["стоимость"]
+              type: price
+      responses:
+        200:
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+components:
+  schemas:
+    Attributes:
+      type: object
+      required:
+        - name
+        - texts
+        - type
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: somename
+        texts:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+          enum:
+          - price
+          - datetime
+          example: price
+      xml:
+        name: blockAttribute
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 400
+          maximum: 600
+          example: 400
+        message:
+          type: string
+  parameters:
+    X-Request-ID:
+      name: X-Request-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: "8dff7ffa-f4be-11e8-8eb2-f2801f1b9fd1"
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    204:
+      description: No Content
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error
+

@@ -1,0 +1,489 @@
+openapi: 3.0.1
+info:
+  description: Сервис обработки контента
+  version: 1.0-0
+  title: content-service
+tags:
+  - name: lc
+    description: Requests from lc
+  - name: recognition-service
+    description: Requests from recognition-service
+  - name: abbyy-ready-service
+    description: Requests from abbyy-ready-service
+  - name: sm-search-service
+    description: Requests from abbyysm search service
+servers:
+  - url: 'http://content-service.n-logic.ru:8085/content-service/v1'
+    description: Sandbox for tests
+paths:
+  '/requestID/{requestID}':
+    get:
+      tags:
+        - lc
+      summary: get data by requestID
+      description: ''
+      operationId: get jobs
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: requestID
+          description: request id
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+      responses:
+        '200':
+          $ref: '#/components/responses/200DataByRequestID'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+    post:
+      tags:
+        - lc
+      summary: get data by requestID
+      description: ''
+      operationId: get jobs
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: requestID
+          description: request id
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/propertiesBody"
+      responses:
+        '204':
+          $ref: '#/components/responses/200DataByRequestID'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'    
+
+    delete:
+      tags:
+        - lc
+      summary: deletes data and metadata for the given requestID
+      description: ''
+      operationId: get jobs
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: requestID
+          description: request id
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+  '/clientID/{clientID}':
+    get:
+      tags:
+        - lc
+      summary: get data by clientID
+      description: ''
+      operationId: get jobs
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client id
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+      responses:
+        '200':
+          $ref: '#/components/responses/200DataByClientID'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/userID/{userID}':
+    get:
+      tags:
+        - lc
+      summary: get data by userID
+      description: ''
+      operationId: get jobs
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: userID
+          description: user id
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+      responses:
+        '200':
+          $ref: '#/components/responses/200DataByUserID'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  /raw-files:
+    post:
+      tags:
+        - lc
+      summary: Add raw file into system
+      description: >-
+        see:
+        https://swagger.io/docs/specification/describing-request-body/multipart-requests/
+      operationId: addFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RawFile'
+      responses:
+        '200':
+          $ref: '#/components/responses/200FileInfo'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/raw-files/{filename}':
+    get:
+      tags:
+        - lc
+        - recognition-service
+      summary: get raw file
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: filename
+          description: filename and extention
+          required: true
+          schema:
+            type: string
+          example: 1.pdf
+      responses:
+        '200':
+          $ref: '#/components/responses/200Data'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  /recognized-files:
+    post:
+      tags:
+        - lc
+        - abbyy-ready-service
+      summary: Add recognized file into system
+      description: >-
+        see:
+        https://swagger.io/docs/specification/describing-request-body/multipart-requests/
+      operationId: addFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RawFile'
+      responses:
+        '200':
+          $ref: '#/components/responses/200FileInfo'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/recognized-files/{filename}':
+    get:
+      tags:
+        - lc
+        - sm-search-service
+      summary: get recognized files
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: filename
+          description: filename and extention
+          required: true
+          schema:
+            type: string
+          example: 1.xml
+      responses:
+        '200':
+          $ref: '#/components/responses/200RecognizedData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  /search-result:
+    post:
+      tags:
+        - lc
+        - sm-search-service
+      summary: Add search result in content system
+      description: >-
+        see:
+        https://swagger.io/docs/specification/describing-request-body/multipart-requests/
+      operationId: getResult
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResultData'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/search-result/{requestID}':
+    get:
+      tags:
+        - lc
+      summary: get results data
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: requestID
+          description: result's requestID
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+      responses:
+        '200':
+          $ref: '#/components/responses/200ResultData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+components:
+  schemas:
+    RawFile:
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            requestID:
+              type: string
+              format: uuid
+            userID:
+              type: string
+            clientID:
+              type: string
+            fileName:
+              type: string
+            md5:
+              type: string
+        file:
+          type: string
+          format: binary
+    ResultData:
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            requestID:
+              type: string
+              format: uuid
+            userID:
+              type: string
+            clientID:
+              type: string
+            fileName:
+              type: string
+            md5:
+              type: string
+        file:
+          type: string
+          format: binary
+    RawFileInfo:
+      type: object
+      required:
+        - link
+        - md5
+      properties:
+        link:
+          type: string
+          example: link to download raw file
+        md5:
+          type: string
+          example: file md5sum
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          example: 1
+        message:
+          type: string
+    RequestIDDataArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/RequestIDData'
+    RequestIDData:
+      type: object
+      properties:
+        requestID:
+          type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+        clientID:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99999999
+          example: 1
+        userID:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99999999
+          example: 1
+        properties:
+          type: object
+        file-paths:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                example: 'http://content-service.n-logic.ru:8083/content-service/v1/raw-files/1.jpg'
+              md5:
+                type: string
+                example: 96e79218965eb72c92a549dd5a330112
+              type:
+                type: string
+                enum: [raw, recognized, search]
+                example: 'raw'
+              user_filename:
+                type: string
+                example: b.pdf
+    propertiesBody:
+      type: object
+      
+  parameters:
+    X-REQUEST-ID:
+      name: X-REQUEST-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    '200':
+      description: Ok
+    200Data:
+      description: Ok
+      content:
+        image/*:
+          schema:
+            type: string
+            format: binary
+        application/*:
+          schema:
+            type: string
+            format: binary
+    200DataByRequestID:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestIDData'
+    200DataByClientID:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestIDDataArray'
+    200DataByUserID:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestIDDataArray'
+    200RecognizedData:
+      description: Ok
+      content:
+        application/xml:
+          schema:
+            type: string
+            format: binary
+        plain/text:
+          schema:
+            type: string
+            format: binary
+    200ResultData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: string
+            format: binary
+    200FileInfo:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RawFileInfo'
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error

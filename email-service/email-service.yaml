@@ -1,0 +1,161 @@
+openapi: 3.0.1
+info:
+  description: Сервис отправки уведомлений по почте
+  version: 1.0-0
+  title: Email-service
+tags:
+  - name: client
+    description: Client's requests
+servers:
+  - url: 'http://n-logic.ru:8082/email/v1/'
+    description: Sandbox for tests
+paths:
+  /registration:
+    post:
+      tags:
+        - client
+      summary: Sends registration email
+      description: >-
+        curl -i -H 'X-SERVICE-NAME: test' -H 'X-REQUEST-ID:
+        eb5ddb60-846f-48d1-a423-60af3ee79d5a' -X POST
+        'http://127.0.0.1:9090/email/v1/registration' -d '{"email-to":
+        "cqspel@gmail.com","link":
+        "http://n-logic.ru/U2Vs2N2wCHubC3NUKLE5zfrkiLDhvLPTxPNQl5qH"}'
+      operationId: sendRegistration
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
+            example:
+              username: test client
+              login: test
+              email: somebody@yandex.ru
+              link: 'http://n-logic.ru/U2Vs2N2wCHubC3NUKLE5zfrkiLDhvLPTxPNQl5qH'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  /registration/debug:
+    post:
+      tags:
+        - client
+      summary: Sends registration email
+      description: Returns 200 OK with debug info in HTTP body
+      operationId: sendRegistration
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
+            example:
+              username: test client
+              login: test
+              email: somebody@yandex.ru
+              link: 'http://n-logic.ru/U2Vs2N2wCHubC3NUKLE5zfrkiLDhvLPTxPNQl5qH'
+      responses:
+        '200':
+          $ref: '#/components/responses/200Debug'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+components:
+  schemas:
+    Registration:
+      type: object
+      required:
+        - username
+        - login
+        - email-to
+        - link
+      properties:
+        username:
+          type: string
+          example: partner admin username
+        login:
+          type: string
+          example: user's login
+        email-to:
+          type: string
+          example: user's email
+        link:
+          type: string
+          example: user's unique link
+      xml:
+        name: Registration
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          example: 1
+        message:
+          type: string
+  parameters:
+    X-REQUEST-ID:
+      name: X-REQUEST-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    '200':
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Registration'
+          example:
+            link: 'http://n-logic.ru/U2Vs2N2wCHubC3NUKLE5zfrkiLDhvLPTxPNQl5qH'
+    200Debug:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Registration'
+          example:
+            _inputBody: >-
+              {"array": [1,2],"test": "123", "link":
+              "http://n-logic.ru/U2Vs2N2wCHubC3NUKLE5zfrkiLDhvLPTxPNQl5qH"}
+            _contentLength: 100
+            link: 'http://n-logic.ru/U2Vs2N2wCHubC3NUKLE5zfrkiLDhvLPTxPNQl5qH'
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error

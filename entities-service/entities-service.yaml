@@ -1,0 +1,1231 @@
+openapi: 3.0.1
+info:
+  description: Сервис обработки entities
+  version: 1.0-0
+  title: entities-service
+tags:
+  - name: entities
+    description: Requests for entities
+  - name: blocks
+    description: Requests for blocks
+  - name: tags
+    description: Requests for tags
+  - name: search_index
+    description: Indexing and searching
+  - name: entities_hierarchy
+    description: Entities hierarchy
+
+servers:
+  - url: 'http://services2.n-logic.ru:8086/entities-service/v1'
+    description: Sandbox for tests
+paths:
+  /entity:
+    post:
+      tags:
+        - entities
+      summary: Add or update an entity (update if it already exists)
+      description: Add or update an entity (update if it already exists)
+      operationId: addFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/DAO'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    get:
+      tags:
+        - entities
+      summary: get info about all entities
+      description: get info about all entities
+      operationId: getEntity
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: query
+          name: names
+          schema:
+            type: string
+          description: Optional parameter. Name of entities to get
+        - in: query
+          name: page
+          schema:
+            type: integer
+          example: 0
+          description: Optional parameter for paging
+        - in: query
+          name: size
+          schema:
+            type: integer
+          example: 10
+          description: Optional parameter for paging
+      responses:
+        '200':
+          $ref: '#/components/responses/200TypeData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/entity/names':
+    post:
+      tags:
+        - entities
+      summary: Get information about the given blocks
+      description: Get information about the given blocks
+      operationId: getBlocks
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: query
+          name: page
+          schema:
+            type: integer
+          example: 0
+          description: Optional parameter for paging
+        - in: query
+          name: size
+          schema:
+            type: integer
+          example: 10
+          description: Optional parameter for paging
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/TypeArray'
+      responses:
+        '200':
+          $ref: '#/components/responses/200TypeData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/entity/name/{name}':
+    get:
+      tags:
+        - entities
+      summary: get the entity with the given name
+      description: get the entity with the given name
+      operationId: getEntity1
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to get
+          required: true
+          schema:
+            type: string
+          example: entity1
+      responses:
+        '200':
+          $ref: '#/components/responses/200Data'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - entities
+      summary: deletes the entity with the given name
+      description: deletes the entity with the given name
+      operationId: deleteEntity
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to delete
+          required: true
+          schema:
+            type: string
+          example: entity1
+        - in: query
+          name: force
+          schema:
+            type: boolean
+          description: Force delete an entity
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/entity/type/{type}':
+    get:
+      tags:
+        - entities
+      summary: get the entity with the given name
+      description: get the entity with the given name
+      operationId: getEntity2
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: type
+          description: name of the entity to get
+          required: true
+          schema:
+            type: string
+          example: entity1
+        - in: query
+          name: type
+          required: false
+          schema:
+            type: string
+          description: Entity type
+      responses:
+        '200':
+          $ref: '#/components/responses/200Block'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/entity/clientID/{clientID}':
+    get:
+      tags:
+        - entities
+      summary: get the entity with the given name
+      description: get the entity with the given name
+      operationId: getEntity3
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client ID
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/200TypeData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    post:
+      tags:
+        - entities
+      summary: adds the submited entities in the body to the requested client ID
+      description: adds the submited entities in the body to the requested client ID
+      operationId: addEntitiesToClient
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client ID
+          required: true
+          schema:
+            type: string
+          example: 1
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/TypeArray'
+      responses:
+        '200':
+          $ref: '#/components/responses/200Block'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - entities
+      summary: deletes all the entities for a given client
+      description: deletes all the entities for a given client
+      operationId: deleteEntityForClient
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client ID
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  /block:
+    post:
+      tags:
+        - blocks
+      summary: Add or update an entity (update if it already exists)
+      description: Add or update an entity (update if it already exists)
+      operationId: addFile4
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/DAOBlocksOnly'
+      responses:
+        '200':
+          $ref: '#/components/responses/200ID'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    get:
+      tags:
+        - blocks
+      summary: get info about all blocks
+      description: get info about all blocks
+      operationId: getEntity5
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: query
+          name: ids
+          schema:
+            type: string
+          description: Optional parameter. Ids of blocks to get
+        - in: query
+          name: format
+          schema:
+            type: string
+          example: html
+          description: Optional parameter. Ids of blocks to get
+        - in: query
+          name: page
+          schema:
+            type: integer
+          example: 0
+          description: Optional parameter for paging
+        - in: query
+          name: size
+          schema:
+            type: integer
+          example: 10
+          description: Optional parameter for paging
+      responses:
+        '200':
+          $ref: '#/components/responses/200DataBlocksArray'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+          
+  '/block/ids':
+    post:
+      tags:
+        - blocks
+      summary: Get information about the given blocks
+      description: Get information about the given blocks
+      operationId: getBlocks6
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: query
+          name: format
+          schema:
+            type: string
+          example: html
+          description: Optional parameter. Ids of blocks to get
+        - in: query
+          name: page
+          schema:
+            type: integer
+          example: 0
+          description: Optional parameter for paging
+        - in: query
+          name: size
+          schema:
+            type: integer
+          example: 10
+          description: Optional parameter for paging
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/TypeArrayInts'
+      responses:
+        '200':
+          $ref: '#/components/responses/200DataBlocksArray'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/block/id/{id}':
+    get:
+      tags:
+        - blocks
+      summary: get the block with the given id
+      description: get the block with the given id
+      operationId: getBlockId
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: id
+          description: id of the block to get
+          required: true
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: format
+          schema:
+            type: string
+          example: html
+          description: Optional parameter. Ids of blocks to get
+      responses:
+        '200':
+          $ref: '#/components/responses/200DataBlocks'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+          
+    post:
+      tags:
+        - blocks
+      summary: update the block with the given id
+      description: update the block entity with the given id
+      operationId: updateBlockId
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: id
+          description: id of the block to update
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/DAOBlocksOnly'
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - blocks
+      summary: deletes the entity with the given name
+      description: deletes the entity with the given name
+      operationId: deleteEntity7
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: id
+          description: id of the block to delete
+          required: true
+          schema:
+            type: string
+          example: entity1
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/block/{id}/entities':
+    post:
+      tags:
+        - blocks
+      summary: Adds entities to the given block
+      description: Adds entities to the given block
+      operationId: addEntities
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: id
+          description: id of the block to update
+          required: true
+          schema:
+            type: string
+          example: block1
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/TypeArrayWithMarker'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    get:
+      tags:
+        - blocks
+      summary: get the entities for the given block
+      description: get the entities for the given block
+      operationId: getEntities
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: id
+          description: id of the entity to get
+          required: true
+          schema:
+            type: string
+          example: block1
+      responses:
+        '200':
+          $ref: '#/components/responses/200BlockEntitiesOnly'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - blocks
+      summary: deletes the given entities for the given block
+      description: deletes the given entities for the given block
+      operationId: deleteEntities
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: id
+          description: id of the entity to delete
+          required: true
+          schema:
+            type: string
+          example: blockname
+        - in: query
+          name: name
+          description: entities name to be deleted from block
+          required: true
+          schema:
+            type: string
+          example: test
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/block/index':
+    get:
+      tags:
+        - blocks
+        - search_index
+      summary: Index all blocks
+      description: Index all blocks
+      operationId: BlockIndex
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/block/search':
+    post:
+      tags:
+        - blocks
+        - search_index
+      summary: Search in blocks
+      description: Search in blocks
+      operationId: BlockSearch
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/Search'
+      responses:
+        '200':
+          $ref: '#/components/responses/200BlockSearchResult'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+          
+  '/entity/index':
+    get:
+      tags:
+        - blocks
+        - search_index
+      summary: Index all blocks
+      description: Index all blocks
+      operationId: BlockIndex8
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/entity/search':
+    post:
+      tags:
+        - blocks
+        - search_index
+      summary: Search in blocks
+      description: Search in blocks
+      operationId: BlockSearch9
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/Search'
+      responses:
+        '200':
+          $ref: '#/components/responses/200EntitySearchResult'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  
+  /tag:
+    post:
+      tags:
+        - tags
+      summary: Add or update a tag (update if it already exists)
+      description: Add or update a tag (update if it already exists)
+      operationId: addTag
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/DAOTags'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    get:
+      tags:
+        - tags
+      summary: get info about all tags
+      description: get info about all tags
+      operationId: getEntity10
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      responses:
+        '200':
+          $ref: '#/components/responses/200AllData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/tag/name/{name}':
+    delete:
+      tags:
+        - tags
+      summary: deletes the entity with the given name
+      description: deletes the entity with the given name
+      operationId: deleteEntity11
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to delete
+          required: true
+          schema:
+            type: string
+          example: entity1
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/block/{id}/tags':
+    post:
+      tags:
+        - tags
+      summary: Add or update a tag (update if it already exists)
+      description: Add or update a tag (update if it already exists)
+      operationId: addTag12
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: id
+          description: id of the block to add tags to
+          required: true
+          schema:
+            type: string
+          example: entity1
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/TypeArray'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - tags
+      summary: deletes the given tags from the given block
+      description: deletes the given tags from the given block
+      operationId: deleteBlockTags
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: id
+          description: id of the block to add tags to
+          required: true
+          schema:
+            type: string
+          example: entity1
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Entity to delete
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/entity/{name}/tags':
+    post:
+      tags:
+        - tags
+      summary: Add or update a tag (update if it already exists)
+      description: Add or update a tag (update if it already exists)
+      operationId: addTag13
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to delete
+          required: true
+          schema:
+            type: string
+          example: entity1
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/TypeArray'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - tags
+      summary: deletes the entity with the given name
+      description: deletes the entity with the given name
+      operationId: deleteEntity14
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to delete
+          required: true
+          schema:
+            type: string
+          example: entity1
+        - in: query
+          name: tag
+          schema:
+            type: string
+          description: Tag to delete
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/entity/name/{name}/children':
+    get:
+      tags:
+        - entities
+        - entities_hierarchy
+      summary: get children for the given entity
+      description: get children for the given entity
+      operationId: getChildren
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to get
+          required: true
+          schema:
+            type: string
+          example: entity1
+      responses:
+        '200':
+          $ref: '#/components/responses/200TypeDataWithoutChildren'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - entities
+        - entities_hierarchy
+      summary: delete children for the given entity
+      description: delete children for the given entity
+      operationId: deleteChildren
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to get
+          required: true
+          schema:
+            type: string
+          example: entity1
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/entity/name/{name}/parents':
+    get:
+      tags:
+        - entities
+        - entities_hierarchy
+      summary: get parents for the given entity
+      description: get parents for the given entity
+      operationId: getParents
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to get
+          required: true
+          schema:
+            type: string
+          example: entity1
+      responses:
+        '200':
+          $ref: '#/components/responses/200TypeDataWithoutChildren'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/entity/name/{name}/child':
+    post:
+      tags:
+        - entities
+        - entities_hierarchy
+      summary: add children array name to the given entity
+      description: add children array name to the given entity
+      operationId: addChildren
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to get
+          required: true
+          schema:
+            type: string
+          example: entity1
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/TypeArray'
+      responses:
+        '200':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/entity/name/{name}/father':
+    post:
+      tags:
+        - entities
+        - entities_hierarchy
+      summary: add parents array name to the given entity
+      description: add parents array name to the given entity
+      operationId: addParents
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: name
+          description: name of the entity to get
+          required: true
+          schema:
+            type: string
+          example: entity1
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/TypeArray'
+      responses:
+        '200':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+components:
+  schemas:
+    DAOTags:
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+    DAO:
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+        entityType:
+          type: string
+          enum:
+            - numeric
+            - string
+            - boolean
+            - document
+            - list
+        defaultValue:
+          type: string
+        entityStatus:
+          type: string
+          enum:
+            - active
+            - deleted
+        hierarchy:
+          type: string
+          enum:
+            - base
+            - child
+    DAOWithMarkers:
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+        entityType:
+          type: string
+          enum:
+            - numeric
+            - string
+            - boolean
+            - document
+        defaultValue:
+          type: string
+        entityStatus:
+          type: string
+          enum:
+            - active
+            - deleted
+        char_from:
+          type: integer
+        char_to:
+          type: integer
+    DAOWithTags:
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+        entityType:
+          type: string
+          enum:
+            - numeric
+            - string
+            - boolean
+            - document
+        defaultValue:
+          type: string
+        entityStatus:
+          type: string
+          enum:
+            - active
+            - deleted
+        hierarchy:
+          type: string
+          enum:
+            - base
+            - child
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/DAOTags'
+        children:
+          type: array
+          items:
+            type: string
+    DAOBlocksOnly:
+      type: object
+      properties:
+        displayName:
+          type: string
+        text:
+          type: string
+    DAOBlocks:
+      type: object
+      properties:
+        id:
+          type: integer
+        displayName:
+          type: string
+        text:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/DAOWithMarkers'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/DAOTags'
+    TypeArray:
+      type: array
+      items:
+        type: string
+    TypeArrayInts:
+      type: array
+      items:
+        type: integer
+    TypeArrayWithMarker:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          char_from:
+            type: integer
+          char_to:
+            type: integer
+    DAOArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/DAOWithMarkers'
+    DAOArrayWithTags:
+      type: array
+      items:
+        $ref: '#/components/schemas/DAOWithTags'
+    DAOArrayWithoutChildren:
+      type: array
+      items:
+        $ref: '#/components/schemas/DAO'        
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          example: 1
+        message:
+          type: string
+          
+    Search:
+      type: object
+      properties:
+        text:
+          type: string
+  
+    BlockSearchResult:
+      type: array
+      items:
+        type: object
+        properties:
+          text:
+            type: string
+          id:
+            type: integer
+            
+    EntitySearchResult:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+
+
+  parameters:
+    X-REQUEST-ID:
+      name: X-REQUEST-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    '200':
+      description: Ok
+    '204':
+      description: NO CONTENT
+    200ID:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer   
+    200Data:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DAOWithTags'
+    200TypeData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DAOArrayWithTags'
+    200TypeDataWithoutChildren:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DAOArrayWithoutChildren'
+    200DataBlocks:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DAOBlocks'
+    200DataBlocksArray:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/DAOBlocks'
+    200AllData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TypeArray'
+    200Block:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TypeArray'
+    200BlockEntitiesOnly:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DAOArray'
+
+    200BlockSearchResult:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BlockSearchResult'
+            
+    200EntitySearchResult:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EntitySearchResult'
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error

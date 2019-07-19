@@ -1,0 +1,162 @@
+openapi: 3.0.1
+info:
+  description: Сервис обработки контента
+  version: 1.0-0
+  title: sms-service
+tags:
+  - name: sms-service
+    description: Requests to  sms-service
+servers:
+  - url: 'http://lex2vec.ru:8088/sms-service/v1'
+    description: Sandbox for tests
+    # variables:
+paths:
+  "/sms":
+    post:
+      tags:
+        - sms-service
+      summary: "Sends SMS without confirmation needed"
+      description: "see: https://swagger.io/docs/specification/describing-request-body/multipart-requests/"
+      operationId: sendSMS
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/smsWithoutConfirm'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+          
+  "/sms-with-confirm":
+    post:
+      tags:
+        - sms-service
+      summary: "Sends SMS with callback"
+      description: "see: https://swagger.io/docs/specification/describing-request-body/multipart-requests/"
+      operationId: sendSMSwithConfirm
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/smsWithConfirm'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+          
+  "/sms-status/message-id/{id}":
+    get:
+      tags:
+        - sms-service
+      summary: "Checks the status of a particular SMS, confirmed or not"
+      description: "see: https://swagger.io/docs/specification/describing-request-body/multipart-requests/"
+      operationId: confirmSMS
+      parameters:
+        - in: path
+          name: id 
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Message ID
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+components:
+  schemas:
+    smsWithoutConfirm:
+      type: object
+      properties:
+        to:
+          type: string
+        text:
+          type: string
+    smsWithConfirm:
+      type: object
+      properties:
+        to:
+          type: string
+        text:
+          type: string
+        aoc:
+          type: object
+          properties:
+            notify-url:
+              type: string
+            http-method:
+              type: string
+            header:
+              type: string
+            message-body:
+              type: string
+            ttl:
+              type: integer
+        id:
+            type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          example: 1
+        message:
+          type: string
+  parameters:
+    X-REQUEST-ID:
+      name: X-REQUEST-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    '200':
+      description: Ok
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error

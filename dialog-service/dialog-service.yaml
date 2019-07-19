@@ -1,0 +1,702 @@
+openapi: 3.0.1
+info:
+  description: Dialog service
+  version: 1.0-0
+  title: Dialog service
+tags:
+  - name: dialog-blocks
+    description: dialog-blocks
+  - name: session
+    description: session
+servers:
+  - url: 'http://dialog-service.nlogic.ru:8090/dialog-service/v1'
+    description: sandbox
+paths:
+##############################################################
+####################### DIALOG-BLOCKS ########################
+##############################################################
+  '/dialogBlock/clientID/{clientID}':
+    get:
+      tags:
+        - dialog-blocks
+      summary: "gets all client's dialog-blocks"
+      description: gets all dialog-blocks sets for client
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client id
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/200DialogBlocks'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    post:
+      tags:
+        - dialog-blocks
+      summary: "add/update dialog-block for entities"
+      description: add/update dialog-block for entities. PRK = entities array
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client id
+          required: true
+          schema:
+            type: string
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/DialogBlockNoID'  # add
+                - $ref: '#/components/schemas/DialogBlock'      # update
+      responses:
+        '200':
+            $ref: '#/components/responses/200QuestionID'
+        '204':
+            $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - dialog-blocks
+      summary: "truncates client's dialog-blocks records"
+      description: truncates client's dialog-blocks records
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client id
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/dialogBlock/clientID/{clientID}/entities/{entitiesNames}':
+    get:
+      tags:
+        - dialog-blocks
+        - in-session
+      summary: "get dialog-blocks for entities list"
+      description: "get dialog-blocks suites for entities list. PRK: entitiesNames jsonArray"
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client id
+          required: true
+          schema:
+            type: string
+          example: 1
+        - in: path
+          name: entitiesNames
+          description: clients names
+          required: true
+          schema:
+            type: string
+          example: name1,name2
+      responses:
+        '200':
+          $ref: '#/components/responses/200DialogBlocks'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/dialogBlock/{dialogBlockID}':
+    get:
+      tags:
+        - dialog-blocks
+      summary: "get dialog-block"
+      description: get dialog-block
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: dialogBlockID
+          description: dialog-block id
+          required: true
+          schema:
+            type: string
+          example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+      responses:
+        '200':
+          $ref: '#/components/responses/200DialogBlock'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    post:
+      tags:
+        - dialog-blocks
+      summary: "updates dialog-block"
+      description: updates dialog-block
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: dialogBlockID
+          description: dialog-block id
+          required: true
+          schema:
+            type: string
+          example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DialogBlock'
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - dialog-blocks
+      summary: "deletes dialog-block"
+      description: deletes dialog-block
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: dialogBlockID
+          description: dialog-block id
+          required: true
+          schema:
+            type: string
+          example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/dialogBlock/{dialogBlockID}/questions':
+    get:
+      tags:
+        - dialog-blocks
+      summary: "get dialog-block's texts"
+      description: get dialog-block's texts
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: dialogBlockID
+          description: dialog block id
+          required: true
+          schema:
+            type: string
+          example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+      responses:
+        '200':
+          $ref: '#/components/responses/200QuestionsData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/dialogBlock/{dialogBlockID}/confirmations':
+    get:
+      tags:
+        - dialog-blocks
+      summary: "get dialog-block's confirmations"
+      description: get dialog-block's confirmations
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: dialogBlockID
+          description: dialog block id
+          required: true
+          schema:
+            type: string
+          example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+      responses:
+        '200':
+          $ref: '#/components/responses/200ConfirmationsListData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/dialogBlock/{dialogBlockID}/entities':
+    get:
+      tags:
+        - dialog-blocks
+      summary: "gets dialog-block's etities list"
+      description: gets dialog-block's etities list
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: dialogBlockID
+          description: dialog block id
+          required: true
+          schema:
+            type: string
+          example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+      responses:
+        '200':
+          $ref: '#/components/responses/200EntitiesListData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+##############################################################
+########################## SESSION ###########################
+##############################################################
+  '/session/client/{clientID}/userinfo/{userInfoString}':
+    get:
+      tags:
+        - session
+      summary: "creates user's session"
+      description: creates user's session. You can add any user data from messager in userinfoString
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: client ID
+          required: true
+          schema:
+            type: string
+          example: 1
+        - in: path
+          name: userInfoString
+          description: user info String
+          required: true
+          schema:
+            type: string
+          example: "79267760001"
+      responses:
+        '200':
+          $ref: '#/components/responses/200SessionData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/session/{sessionID}/nextQuestion':
+    get:
+      tags:
+        - session
+      summary: "gets next question"
+      description: gets next question by weight
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: sessionID
+          description: session id
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+      responses:
+        '200':
+          $ref: '#/components/responses/200QuestionData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/session/{sessionID}/entity/{entityName}/nextConfirmation':
+    get:
+      tags:
+        - session
+      summary: "gets next question"
+      description: gets next question by weight
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: sessionID
+          description: session id
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+        - in: path
+          name: entityName
+          description: entity name
+          required: true
+          schema:
+            type: string
+          example: "delivery_datetime"
+      responses:
+        '200':
+          $ref: '#/components/responses/200QuestionData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/session/{sessionID}/entities':
+    post:
+      tags:
+        - session
+      summary: "save found entities"
+      description: save found entities
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: sessionID
+          description: session id
+          required: true
+          schema:
+            type: string
+          example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntityWithValueList'
+      responses:
+        '204':
+          $ref: '#/components/responses/200QuestionData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/session/{sessionID}':
+    delete:
+      tags:
+        - session
+      summary: "deletes session"
+      description: deletes session
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: sessionID
+          description: question id
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/session/{sessionID}/truncate':
+    delete:
+      tags:
+        - session
+      summary: "truncates session"
+      description: deletes all data in session
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: sessionID
+          description: question id
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+##############################################################
+########################## SCHEMAS ###########################
+##############################################################
+components:
+  schemas:
+###################################################
+###################### ENTITIES ###################
+###################################################
+    EntityWithValue:
+      type: object
+      properties:
+        name:
+          type: string
+          default: ""
+          example: "delivery_datetime"
+        value:
+          type: string
+          default: ""
+          example: ""
+    EntityWithValueList:
+      type: array
+      items:
+        $ref: "#/components/schemas/EntityWithValue"
+    Entity:
+      type: string
+      default: ""
+      example: "delivery_datetime"
+    EntitiesList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Entity"
+###################################################
+################### CONFIRMATIONS #################
+###################################################
+    Confirmation:
+      type: object
+      properties:
+        confirmation:
+          type: string
+          default: ""
+          example: "Заменить дату поставки?"
+    ConfirmationsList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Confirmation"
+###################################################
+################### DIALOG-BLOCKS #################
+###################################################
+    DialogBlockOptions:
+      type: object
+      properties:
+        manual-weight:
+          type: number
+          format: float
+          default: 1.0
+          example: 1.0
+        language:
+          type: string
+          enum: ["ru", "en"]
+          default: "ru"
+          example: "ru"
+    DialogBlock:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          default: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+          example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+        clientID:
+          type: integer
+          default: 1
+          example: 1
+        options:
+          $ref: '#/components/schemas/DialogBlockOptions'
+        entities-size:
+          type: integer
+          default: 1
+          example: 1
+        entities:
+          $ref: '#/components/schemas/EntitiesList'
+        questions:
+          $ref: '#/components/schemas/QuestionsList'
+        confirmations:
+          $ref: '#/components/schemas/ConfirmationsList'
+    DialogBlocks:
+      type: array
+      items:
+        $ref: '#/components/schemas/DialogBlock'
+    DialogBlockNoID:
+      type: object
+      properties:
+        clientID:
+          type: integer
+          default: 1
+          example: 1
+        manual-weight:
+          type: number
+          format: float
+          default: 1.0
+          example: 1.0
+        language:
+          type: string
+          enum: ["ru", "en"]
+          default: "ru"
+        entities-size:
+          type: integer
+          default: 1
+          example: 1
+        entities:
+          $ref: '#/components/schemas/EntitiesList'
+        questions:
+          $ref: '#/components/schemas/QuestionsList'
+        confirmations:
+          $ref: '#/components/schemas/ConfirmationsList'
+
+###################################################
+##################### QUESTIONS ###################
+###################################################
+    Question:
+      type: object
+      properties:
+        question:
+          type: string
+          default: ""
+          example: "Когда хотите получить товар?"
+    QuestionsList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Question"
+    QuestionID:
+      type: object
+      properties:
+        questionID:
+          type: string
+          format: uuid
+          default: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+###################################################
+###################### SESSIONS ###################
+###################################################
+    SessionID:
+      type: object
+      properties:
+        sessionID:
+          type: string
+          format: uuid
+          default: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+    UserInfo:
+      type: object
+      properties:
+        externalSession:
+          type: string
+          default: ""
+        user:
+          type: object
+          properties:
+            userID:
+              type: string
+              default: ""
+            userMsisdn:
+              type: string
+              default: ""
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          example: 1
+        message:
+          type: string
+  parameters:
+    X-REQUEST-ID:
+      name: X-REQUEST-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    200:
+      description: Ok
+    200DialogBlock:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DialogBlock'
+    200DialogBlocks:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DialogBlocks'
+    200QuestionID:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QuestionID'
+          example:
+            questionId: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    200SessionData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SessionID'
+          example:
+            questionId: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    200QuestionData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Question'
+    200QuestionsData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QuestionsList'
+    200QuestionListData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QuestionsList'
+    200ConfirmationsListData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConfirmationsList'
+    200ConfirmationData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Confirmation'
+    200EntitiesListData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EntitiesList'
+    204:
+      description: No Content
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error

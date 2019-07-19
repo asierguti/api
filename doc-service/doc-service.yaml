@@ -1,0 +1,427 @@
+openapi: 3.0.1
+info:
+  description: Document generation service
+  version: 1.0-0
+  title: doc-service
+tags:
+  - name: doc
+    description: Requests for documents
+servers:
+  - url: 'http://services1.n-logic.ru:8090/doc-service/v1'
+    description: Sandbox for tests
+paths:
+  /html-files:
+    post:
+      tags:
+        - doc
+      summary: Add original HTML and converted DOCX files into system
+      description: >-
+        see:
+        https://swagger.io/docs/specification/describing-request-body/multipart-requests/
+      operationId: addFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HTMLText'
+      responses:
+        '200':
+          $ref: '#/components/responses/200FileInfo'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/html-files/{filename}':
+    get:
+      tags:
+        - doc
+      summary: get html file
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: filename
+          description: filename and extention
+          required: true
+          schema:
+            type: string
+          example: 1.pdf
+      responses:
+        '200':
+          $ref: '#/components/responses/200Data'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - doc
+      summary: delete HTML file
+      description: ''
+      operationId: deleteHTMLFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: filename
+          description: filename and extention
+          required: true
+          schema:
+            type: string
+          example: 1.pdf
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/docx-files/{filename}':
+    get:
+      tags:
+        - doc
+      summary: get docx file
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: filename
+          description: filename and extention
+          required: true
+          schema:
+            type: string
+          example: 1.pdf
+      responses:
+        '200':
+          $ref: '#/components/responses/200Data'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+    delete:
+      tags:
+        - doc
+      summary: delete docx file
+      description: ''
+      operationId: deleteDOCXFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: filename
+          description: filename and extention
+          required: true
+          schema:
+            type: string
+          example: 1.pdf
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/metadata/userID/{userID}':
+    get:
+      tags:
+        - doc
+      summary: get docx file
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: userID
+          description: ID of user to search
+          required: true
+          schema:
+            type: string
+          example: 1
+        - in: query
+          name: days
+          schema:
+            type: integer
+          description: Number of days
+        - in: query
+          name: date
+          schema:
+            type: string
+          description: Date to retrieve info from
+      responses:
+        '200':
+          $ref: '#/components/responses/200MetaData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+          
+  '/metadata/userID/{clientID}':
+    get:
+      tags:
+        - doc
+      summary: get docx file
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: clientID
+          description: ID of client to search
+          required: true
+          schema:
+            type: string
+          example: 1
+        - in: query
+          name: days
+          schema:
+            type: integer
+          description: Number of days
+        - in: query
+          name: date
+          schema:
+            type: string
+          description: Date to retrieve info from
+      responses:
+        '200':
+          $ref: '#/components/responses/200MetaData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/metadata/dialogID/{dialogID}':
+    get:
+      tags:
+        - doc
+      summary: get metadata for the dialogID
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: dialogID
+          description: ID of dialog to search
+          required: true
+          schema:
+            type: string
+          example: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/200MetaData'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+
+  '/utils/convert/{format_in}/{format_out}':
+    post:
+      tags:
+        - doc
+      summary: get metadata for the dialogID
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+        - in: path
+          name: format_in
+          description: in format
+          required: true
+          schema:
+            type: string
+          example: html
+        - in: path
+          name: format_out
+          description: in format
+          required: true
+          schema:
+            type: string
+          example: html
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  '/utils/delete':
+    post:
+      tags:
+        - doc
+      summary: get metadata for the dialogID
+      description: ''
+      operationId: getFile
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          'application/json:':
+            schema:
+              $ref: '#/components/schemas/DeleteTransactions'
+      responses:
+        '204':
+          $ref: '#/components/responses/204'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+components:
+  schemas:
+    HTMLText:
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            requestID:
+              type: string
+              format: uuid
+              example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+            userID:
+              type: string
+              example: 1
+            clientID:
+              type: string
+              example: 1
+            dialogID:
+              type: string
+              example: "eb5ddb60-846f-48d1-a423-60af3ee79d5a"
+        entities:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: test
+              value:
+                type: string
+                example: ""
+        text:
+          type: string
+          format: binary
+    RawFileInfo:
+      type: object
+      required:
+        - link
+        - md5
+      properties:
+        link:
+          type: string
+          example: link to download raw file
+        md5:
+          type: string
+          example: file md5sum
+          
+    DeleteTransactions:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            type: string
+    
+    Metadata:
+      type: array
+      items:
+        type: object
+        properties:
+          docx_link:
+            type: string
+          html_link:
+            type: string
+          entities:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          example: 1
+        message:
+          type: string
+  parameters:
+    X-REQUEST-ID:
+      name: X-REQUEST-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    '200':
+      description: Ok
+    200Data:
+      description: Ok
+      content:
+        image/*:
+          schema:
+            type: string
+            format: binary
+        application/*:
+          schema:
+            type: string
+            format: binary
+    200MetaData:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Metadata'
+    200FileInfo:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RawFileInfo'
+    204:
+      description: NO CONTENT
+
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error

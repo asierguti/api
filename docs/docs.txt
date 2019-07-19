@@ -1,0 +1,119 @@
+Документы:
+	DAO:
+		Атрибуты:
+		{
+			"id": 1
+			"name": "price",
+			"texts": [
+				"стоимость",
+				"price"
+			],
+			"type": "price"
+		}
+
+		Тэги:
+		{
+			"id": 1,
+			"value": "tag value",
+			"hash": "tag sha 256 hash"
+		}
+
+		Блок:
+		{
+			"id": 1,
+			"name": "название блока",
+			"description": "описание блока",
+			"default_text": "block default text with attributes",
+			"tags": [
+				"tag1",
+				"tag2",
+				...
+				"tagN"
+			],
+			"attributes": [
+				{
+					"id": 1
+					"name": "price",
+					"texts": [
+						"стоимость",
+						"price"
+					],
+					"type": "price",
+					"questions": [
+						"question text 1",
+						"question text 2"
+					]
+				}
+			],
+			"texts": [
+				{
+					"text": "block plaint text1",
+					"lastmodified_time": "2018-12-01 00:00:00.999999"
+				},
+				{
+					"text": "block plaint text2",
+					"lastmodified_time": "2018-12-01 00:00:00.999999"
+				}
+			],
+			"positive_linked_blocks": [
+				1,
+				2,
+				3
+			],
+			"negative_linked_blocks": [
+				4,
+				5
+			],
+			"questions": [
+				"question text 1",
+				"question text 2",
+				"question text 3"
+			]
+		}
+
+		Документ:
+		{
+			"id": 1,
+			"name": "название типа документа",
+			"description": "описание типа документа",
+			"subjects": [
+				"subject1 text",
+				"subject2 text",
+				"subject3 text"
+			],
+			blocks: [
+				{
+					"section": "Раздел 1",
+					"items": [
+						"1",
+						"2",
+						"3"
+					]
+				}
+				{
+					"section": "Раздел 2",
+					"items": [
+						"10"
+					]
+				}
+			]
+		}
+
+
+Задания в очереди:
+	Нотификация:
+	{
+		"user_id": 1,
+		"email": "someuser@yandex.ru",
+		"msisdn": 79267760013,
+		"text": "some notification text"
+	}
+
+	Сформировать документ:
+	все данные для формирования документа: атрибуты, блоки
+
+	Дообучить???
+
+
+
+

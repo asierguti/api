@@ -1,0 +1,263 @@
+openapi: 3.0.1
+info:
+  description: Сервис асинхронной обработки заданий
+  version: 1.0-0
+  title: Async-service
+tags:
+  - name: lc
+    description: Requests from lc
+  - name: content-service
+    description: Requests from content-service
+servers:
+  - url: 'http://lex2vec.ru:8084/async-service/v1'
+    description: Sandbox for tests
+    # variables:
+paths:
+  /recognize:
+    post:
+      tags:
+        - lc
+      summary: "Queue task with files for recognize"
+      description: ""
+      operationId: sendRegistration
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recognize'
+            example:
+              requestID: 1
+              userID: 1
+              clientID: 1
+              file-paths: [
+              {
+                "path" : "http://n-logic.ru/content-service/v1/raw-files/1.jpg",
+                "md5": "bb4674f8b4cb9303d2cae9c4adf44ebf"
+              },
+              {
+                "path" : "http://n-logic.ru/content-service/v1/raw-files/2.jpg",
+                "md5": "72c2287ac160e9d9bf0e990f019114e7"
+              },
+              {
+                "path" : "http://n-logic.ru/content-service/v1/raw-files/3.pdf",
+                "md5": "be8855551bf89ade89ab3292ba102d86"
+              }
+              ]
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  /recognized:
+    post:
+      tags:
+        - content-service
+      summary: "Queue task with recognized files"
+      description: ""
+      operationId: sendRegistration2
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recognized'
+            example:
+              requestID: 1
+              userID: 1
+              clientID: 1
+              file-paths: [
+              {
+                "path" : "http://n-logic.ru/content-service/v1/recognized-files/1.xml",
+                "md5": "bb4674f8b4cb9303d2cae9c4adf44ebf"
+              },
+              {
+                "path" : "http://n-logic.ru/content-service/v1/recognized-files/2.xml",
+                "md5": "72c2287ac160e9d9bf0e990f019114e7"
+              },
+              {
+                "path" : "http://n-logic.ru/content-service/v1/recognized-files/3.xml",
+                "md5": "be8855551bf89ade89ab3292ba102d86"
+              }
+              ]
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+  /message:
+    post:
+      tags:
+        - content-service
+      summary: "Queue message for delivery to user"
+      description: ""
+      operationId: sendRegistration
+      parameters:
+        - $ref: '#/components/parameters/X-REQUEST-ID'
+        - $ref: '#/components/parameters/X-SERVICE-NAME'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+            example:
+              requestID: 1
+              userID: 1
+              clientID: 1
+              type: "recognized"
+              message: "some text to user"
+      responses:
+        '200':
+          $ref: '#/components/responses/200'
+        4XX:
+          $ref: '#/components/responses/4XX'
+        5XX:
+          $ref: '#/components/responses/5XX'
+components:
+  schemas:
+    Recognize:
+      type: object
+      required:
+        - requestID
+        - userID
+        - clientID
+        - file-paths
+      properties:
+        requestID:
+          type: string
+          example: unique recognotion job ID. Aggregate multiple files
+        userID:
+          type: string
+          example: unique user ID
+        clientID:
+          type: string
+          example: unique client ID
+        file-paths:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+              md5:
+                type: string
+      xml:
+        name: Recognize
+    Recognized:
+      type: object
+      required:
+        - requestID
+        - userID
+        - clientID
+        - file-paths
+      properties:
+        requestID:
+          type: string
+          example: unique recognotion job ID. Aggregate multiple files
+        userID:
+          type: string
+          example: unique user ID
+        clientID:
+          type: string
+          example: unique client ID
+        file-paths:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+              md5:
+                type: string
+      xml:
+        name: Recognized
+    Message:
+      type: object
+      required:
+        - requestID
+        - userID
+        - clientID
+        - message
+        - type
+      properties:
+        requestID:
+          type: string
+          example: unique recognotion job ID. Aggregate multiple files
+        userID:
+          type: string
+          example: unique user ID
+        clientID:
+          type: string
+          example: unique client ID
+        message:
+          type: string
+          example: "распознавание завершено"
+        logictype:
+          type: string
+          example:
+            - "recognized"
+            - "..."
+        type:
+          type: string
+          example:
+            - "ok"
+            - "warring"
+            - "error"
+      xml:
+        name: Message
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          example: 1
+        message:
+          type: string
+  parameters:
+    X-REQUEST-ID:
+      name: X-REQUEST-ID
+      in: header
+      schema:
+        type: string
+        format: uuid
+      required: true
+      example: eb5ddb60-846f-48d1-a423-60af3ee79d5a
+    X-SERVICE-NAME:
+      name: X-SERVICE-NAME
+      in: header
+      schema:
+        type: string
+      required: true
+      example: test
+  responses:
+    '200':
+      description: Ok
+    4XX:
+      description: Some Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 4XX
+            message: error description
+    5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: 5XX
+            message: unexpected error
